@@ -1,0 +1,19 @@
+/* Invalid — triggers 0xFC025: minutes "07" not in {00,15,30,45}. */
+footballsite OddTimeMinutesTest {
+
+  navigation { Testland; }
+
+  country Testland {
+    league TestLeague season "2025-2026" {
+      match {
+        date    "2025-09-01"
+        time    "15:07"
+        home    "Team Alpha"   ("CityA")
+        away    "Team Beta"    ("CityB")
+        score   1 - 0
+        stadium "Test Arena"
+      }
+    }
+  }
+
+}

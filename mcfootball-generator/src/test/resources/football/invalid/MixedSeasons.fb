@@ -1,0 +1,29 @@
+/* Invalid — triggers 0xFC026: two leagues in same country with different seasons. */
+footballsite MixedSeasonsTest {
+
+  navigation { Testland; }
+
+  country Testland {
+    league LeagueA season "2025-2026" {
+      match {
+        date    "2025-09-01"
+        time    "15:00"
+        home    "Team Alpha"   ("CityA")
+        away    "Team Beta"    ("CityB")
+        score   1 - 0
+        stadium "Arena One"
+      }
+    }
+    league LeagueB season "2024-2025" {
+      match {
+        date    "2024-10-01"
+        time    "18:00"
+        home    "Team Gamma"   ("CityC")
+        away    "Team Delta"   ("CityD")
+        score   2 - 2
+        stadium "Arena Two"
+      }
+    }
+  }
+
+}

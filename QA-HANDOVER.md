@@ -12,7 +12,7 @@
 ### Task 1 — Grammar & CoCos Sanity ✅
 - Clean build: `./gradlew :mcfootball-generator:clean :mcfootball-generator:build :mcfootball-generator:generateSiteProd`
 - **Result:** BUILD SUCCESSFUL, 0 MontiCore errors, 0 warnings
-- **CoCos:** "all checks passed" (12 CoCo checkers registered, 0xFC001–0xFC012)
+- **CoCos:** "all checks passed" (27 CoCo checkers registered, 0xFC001–0xFC027)
 - **Edge-case test:** Added temp match with heavy Unicode (`1. FC Köln` vs `Bayern München`, stadium `RheinEnergieStadion`) — parsed and CoCos passed. Removed after verification.
 
 ### Task 2 — Unicode & Special Characters ✅
@@ -70,7 +70,7 @@
 - **Scope:** Valid parsing (3), CoCo positive (2), CoCo negative (7), generator output (3), `toSlug()` utility (4)
 - **Result:** 19/19 PASS
 - **Coverage (handwritten code):**
-  - `football.cocos` — 96% instructions / 85% branches
+  - `football.cocos` — see JaCoCo report for latest (27 CoCos now)
   - `football.generator` — 97% instructions / 100% branches
   - `football.FootballSiteTool` — 0% (uses `System.exit()`, untestable without refactoring)
 
@@ -98,7 +98,7 @@
 
 ### Task 17 — Coverage Report & Risk Summary ✅
 - **JaCoCo report:** `mcfootball-generator/build/reports/jacoco/test/html/`
-- **Total tests:** 46 across 5 test classes — 46/46 PASS
+- **Total tests:** 60 across 6 test classes — 60/60 PASS
 - **Overall project coverage:** 15% instructions / 7% branches (includes massive MontiCore-generated code)
 - **Handwritten code coverage:**
 
@@ -121,11 +121,67 @@
 | 3 | `testBoundaryScoresAreAccepted` | Scores 0-0 and 9-9 pass CoCos and render |
 | 4 | `testInvalidNavigationCountryTriggersCoCo` | 0xFC004 fires for undeclared "Portugal" |
 | 5 | `testInvalidSeasonFormatCoCo` | 0xFC009 fires for "25-26" (not YYYY-YYYY) |
-| 6 | `testTimeFormatBoundaryValues` | 00:00 OK, 23:59 OK, 24:00 triggers 0xFC007 |
+| 6 | `testTimeFormatBoundaryValues` | 00:00 OK, 23:45 OK, 24:00 triggers 0xFC007 |
 | 7 | `testDuplicateLeagueNameCoCo` | 0xFC005 fires for two Bundesliga in one country |
 | 8 | `testLongTeamNamesRenderCorrectly` | 72-char team names render, HTML stays valid |
 | 9 | `testMixedUnicodeTeamNames` | DE/ES/FR/PT Unicode in identifiers + strings |
 | 10 | `testBrandNameRegressionGOODFELLAZßS` | Brand ≥2× per HTML, no old brand leakage |
+
+### CoCo Extended Range Tests (CoCoExtendedRangeTest.java) ✅
+- **Test class:** `CoCoExtendedRangeTest.java` — 14 tests
+- **Result:** 14/14 PASS
+- **CoCo range extended:** 0xFC001–0xFC012 → 0xFC001–0xFC027 (15 new CoCos)
+- **New invalid test models (11):** `MatchDateOutOfSeason.fb`, `ShortStadiumName.fb`, `EmptyLeague.fb`, `DuplicateMatch.fb`, `ScoreUpperBound.fb`, `LongCountryName.fb`, `LongLeagueName.fb`, `BlankCity.fb`, `NonConsecutiveSeason.fb`, `OddTimeMinutes.fb`, `MixedSeasons.fb`
+- **Notes:** 0xFC015 (CountryHasAtLeastOneLeague) and 0xFC018 (NavigationNotEmpty) not testable via .fb — grammar enforces `Country → League+` and `Navigation → NavigationItem+`. 0xFC019 (ScoreNonNegative) not testable — `NatLiteral` is unsigned. 0xFC027 tested programmatically (381-match model).
+
+| # | Test | CoCo Code | Covers |
+|---|------|-----------|--------|
+| 1 | `testMatchDateOutOfSeason` | 0xFC013 | Match year 2027 outside season 2025-2026 |
+| 2 | `testShortStadiumName` | 0xFC014 | Stadium "AB" (2 chars < 3 min) |
+| 3 | `testEmptyLeague` | 0xFC016 | League block with zero matches |
+| 4 | `testDuplicateMatch` | 0xFC017 | Two matches with identical date/time/home/away |
+| 5 | `testScoreUpperBound` | 0xFC020 | Score 100 exceeds 99 limit |
+| 6 | `testLongCountryName` | 0xFC021 | Country name 41 chars (> 40 limit) |
+| 7 | `testLongLeagueName` | 0xFC022 | League name 41 chars (> 40 limit) |
+| 8 | `testBlankCity` | 0xFC023 | City " " is whitespace-only |
+| 9 | `testNonConsecutiveSeason` | 0xFC024 | Season "2025-2027" (2-year gap) |
+| 10 | `testOddTimeMinutes` | 0xFC025 | Time "15:07" not in {00,15,30,45} |
+| 11 | `testMixedSeasons` | 0xFC026 | Two leagues with different seasons in one country |
+| 12 | `testTooManyMatches` | 0xFC027 | 381 matches exceeds 380 limit |
+| 13 | `testAllCoCosPassOnTinyTest` | all 27 | TinyTest.fb triggers 0 errors |
+| 14 | `testAllCoCosPassOnBundesliga` | all 27 | Bundesliga.fb triggers 0 errors |
+
+#### Complete CoCo Registry (27 codes)
+
+| Code | Class | Scope | Description |
+|------|-------|-------|-------------|
+| 0xFC001 | `CountryNameIsUnique` | FootballSite | No duplicate country names |
+| 0xFC002 | `LeagueNameStartUpperCase` | League | League name starts uppercase |
+| 0xFC003 | `MatchHasTwoDifferentTeams` | Match | Home ≠ away team |
+| 0xFC004 | `NavigationCountryExists` | FootballSite | Nav items reference real countries |
+| 0xFC005 | `NoDuplicateLeaguePerCountry` | Country | No duplicate leagues per country |
+| 0xFC006 | `MatchDateFormatIsValid` | Match | Date matches YYYY-MM-DD |
+| 0xFC007 | `MatchTimeFormatIsValid` | Match | Time matches HH:MM (00-23:00-59) |
+| 0xFC008 | `MatchFieldsNotEmpty` | Match | No empty team/city/stadium strings |
+| 0xFC009 | `SeasonFormatIsValid` | League | Season matches YYYY-YYYY |
+| 0xFC010 | `NavigationNoDuplicates` | Navigation | No duplicate nav items |
+| 0xFC011 | `CountryNameStartUpperCase` | Country | Country name starts uppercase |
+| 0xFC012 | `NavigationMatchesAllCountries` | FootballSite | Every country appears in nav |
+| 0xFC013 | `MatchDateWithinSeason` | League | Match date year within season range |
+| 0xFC014 | `StadiumNameMinLength` | Match | Stadium name ≥ 3 characters |
+| 0xFC015 | `CountryHasAtLeastOneLeague` | Country | No empty country blocks |
+| 0xFC016 | `LeagueHasAtLeastOneMatch` | League | No empty league blocks |
+| 0xFC017 | `UniqueMatchPerLeague` | League | No duplicate (date,time,home,away) |
+| 0xFC018 | `NavigationNotEmpty` | Navigation | Navigation has ≥ 1 country |
+| 0xFC019 | `ScoreNonNegative` | Match | Scores ≥ 0 (defensive guard) |
+| 0xFC020 | `ScoreReasonableUpperBound` | Match | Scores ≤ 99 |
+| 0xFC021 | `CountryNameLengthLimit` | Country | Country name ≤ 40 characters |
+| 0xFC022 | `LeagueNameLengthLimit` | League | League name ≤ 40 characters |
+| 0xFC023 | `CityNameNotBlank` | Match | City not whitespace-only |
+| 0xFC024 | `SeasonYearsConsecutive` | League | Season end year = start + 1 |
+| 0xFC025 | `MatchTimeGranularity` | Match | Minutes in {00, 15, 30, 45} |
+| 0xFC026 | `LeagueSeasonConsistentWithinCountry` | Country | All leagues share same season |
+| 0xFC027 | `MaxMatchesPerLeague` | League | ≤ 380 matches per league |
 
 ---
 
@@ -133,7 +189,7 @@
 
 ### High-Risk Areas
 1. **`FootballSiteTool.main()`** — 0% coverage. Uses `System.exit()` which prevents direct JUnit testing. **Recommendation:** Refactor to return exit codes instead of calling `System.exit()`, then add tests for CLI argument parsing, missing-file handling, and production vs. dev mode switching.
-2. **CoCo branch coverage at 85%** — Some CoCo validators have branches that are hard to trigger (e.g., navigating edge cases in `NavigationMatchesAllCountries`). **Recommendation:** Add more invalid test models targeting uncovered branches.
+2. **CoCo branch coverage** — 27 CoCos now covered via `CoCoExtendedRangeTest` (14 tests) + existing negative tests. Most branches exercised. **Recommendation:** Inspect JaCoCo report for any remaining uncovered branches.
 3. **SNAPSHOT dependencies** — `monticore-grammar:7.7.0-SNAPSHOT` and `se-commons:7.7.0-SNAPSHOT` are not reproducible releases. **Recommendation:** Pin to stable releases before production deployment.
 
 ### Medium-Risk Areas

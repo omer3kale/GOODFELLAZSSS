@@ -1,0 +1,10 @@
+/* Invalid — triggers 0xFC016: league has zero matches. */
+footballsite EmptyLeagueTest {
+
+  navigation { Testland; }
+
+  country Testland {
+    league EmptyLeague season "2025-2026" { }
+  }
+
+}

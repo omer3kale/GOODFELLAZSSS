@@ -267,12 +267,12 @@ public class ExtendedDomainTest {
 
         Log.clearFindings();
 
-        // Sub-test B: "23:59" is valid
+        // Sub-test B: "23:45" is valid (both format and granularity)
         {
-            ASTFootballSite ast = parseString(buildModelWithTime("LateNightTest", "23:59"));
+            ASTFootballSite ast = parseString(buildModelWithTime("LateNightTest", "23:45"));
             long before = Log.getErrorCount();
             FootballSiteCoCos.createChecker().checkAll(ast);
-            assertEquals("23:59 should be a valid time", before, Log.getErrorCount());
+            assertEquals("23:45 should be a valid time", before, Log.getErrorCount());
         }
 
         Log.clearFindings();

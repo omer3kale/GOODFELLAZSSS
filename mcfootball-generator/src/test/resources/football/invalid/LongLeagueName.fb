@@ -1,0 +1,21 @@
+/* Invalid — triggers 0xFC022: league name > 40 characters.
+ * "XyxyxyxyxyXyxyxyxyxyXyxyxyxyxyXyxyxyxyxyZ" = 41 chars.
+ */
+footballsite LongLeagueNameTest {
+
+  navigation { Testland; }
+
+  country Testland {
+    league XyxyxyxyxyXyxyxyxyxyXyxyxyxyxyXyxyxyxyxyZ season "2025-2026" {
+      match {
+        date    "2025-09-01"
+        time    "15:00"
+        home    "Team Alpha"   ("CityA")
+        away    "Team Beta"    ("CityB")
+        score   1 - 0
+        stadium "Test Arena"
+      }
+    }
+  }
+
+}

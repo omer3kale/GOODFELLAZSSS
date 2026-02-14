@@ -1,0 +1,19 @@
+/* Invalid — triggers 0xFC020: home score 100 exceeds upper bound of 99. */
+footballsite ScoreUpperBoundTest {
+
+  navigation { Testland; }
+
+  country Testland {
+    league TestLeague season "2025-2026" {
+      match {
+        date    "2025-09-01"
+        time    "15:00"
+        home    "Team Alpha"   ("CityA")
+        away    "Team Beta"    ("CityB")
+        score   100 - 0
+        stadium "Test Arena"
+      }
+    }
+  }
+
+}
