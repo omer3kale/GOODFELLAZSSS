@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Simple secret scan for staged files.
+# Blocks commit if a likely API key assignment is detected.
+
+PATTERN='api[_-]?key.*=.*[A-Za-z0-9]{20,}'
+
+if git diff --cached -U0 | grep -E "$PATTERN" >/dev/null 2>&1; then
+  echo "ERROR: Possible secret detected in staged changes."
+  echo "Use .env for local secrets and keep them out of git."
+  echo "See .env.example for the expected format."
+  exit 1
+fi
+
+exit 0

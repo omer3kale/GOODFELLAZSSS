@@ -13,3 +13,6 @@
 *.log
 *.tmp
 *.swp
+
+# Local env files
+.env

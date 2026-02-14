@@ -5,6 +5,10 @@ on:
     branches: ["main"]
   workflow_dispatch:
 
+# Configure this secret in GitHub Settings → Secrets and variables → Actions
+env:
+  API_FOOTBALL_KEY: ${{ secrets.API_FOOTBALL_KEY }}
+
 permissions:
   contents: read
   pages: write
