@@ -1,0 +1,20 @@
+/* Invalid model: triggers MatchHasTwoDifferentTeams and MatchDateFormatIsValid */
+footballsite SameTeamMatchTest {
+
+  navigation {
+    England;
+  }
+
+  country England {
+    league PremierLeague season "2025-2026" {
+      match {
+        date    "15-02-2026"
+        time    "15:00"
+        home    "Arsenal"              ("London")
+        away    "Arsenal"              ("London")
+        score   0 - 0
+        stadium "Emirates Stadium"
+      }
+    }
+  }
+}

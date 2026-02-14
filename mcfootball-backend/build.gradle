@@ -1,0 +1,32 @@
+/* ─────────────────────────────────────────────────────────────────────
+ * mcfootball-backend — build.gradle
+ * Spring Boot backend: fetches match data, validates with CoCos,
+ * writes .fb model files.
+ *
+ * This module:
+ *   • Runs as a Spring Boot web app
+ *   • Fetches data via ApiClient, validates via ModelValidator
+ *   • Writes .fb files into ${rootProject}/models/generated/
+ *   • Depends on mcfootball-generator for parser + CoCos
+ * ───────────────────────────────────────────────────────────────────── */
+
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '2.7.18'
+    id 'io.spring.dependency-management' version '1.1.4'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter'
+
+    // Generator module — provides MontiCore parser + CoCos for ModelValidator
+    implementation project(':mcfootball-generator')
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}

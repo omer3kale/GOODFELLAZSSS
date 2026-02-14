@@ -1,0 +1,23 @@
+/* Invalid test file — triggers:
+ *   0xFC007  MatchTimeFormatIsValid  ("25:99" is not HH:MM)
+ *   0xFC008  MatchFieldsNotEmpty     (stadium is empty "")
+ *   0xFC009  SeasonFormatIsValid     ("2025" is not YYYY-YYYY)
+ */
+footballsite BadMatchFields {
+
+  navigation { Germany; }
+
+  country Germany {
+    league Bundesliga season "2025" {
+      match {
+        date    "2026-02-15"
+        time    "25:99"
+        home    "Bayern München"    ("Munich")
+        away    "Borussia Dortmund" ("Dortmund")
+        score   2 - 1
+        stadium ""
+      }
+    }
+  }
+
+}

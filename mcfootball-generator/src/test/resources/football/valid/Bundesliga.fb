@@ -1,0 +1,28 @@
+footballsite BundesligaResults {
+
+  navigation {
+    Germany;
+    England;
+  }
+
+  country Germany {
+    league Bundesliga season "2025-2026" {
+      match {
+        date    "2026-02-15"
+        time    "15:30"
+        home    "Bayern München"       ("Munich")
+        away    "Borussia Dortmund"    ("Dortmund")
+        score   2 - 1
+        stadium "Allianz Arena"
+      }
+      match {
+        date    "2026-02-15"
+        time    "15:30"
+        home    "Bayer Leverkusen"     ("Leverkusen")
+        away    "RB Leipzig"           ("Leipzig")
+        score   3 - 3
+        stadium "BayArena"
+      }
+    }
+  }
+}

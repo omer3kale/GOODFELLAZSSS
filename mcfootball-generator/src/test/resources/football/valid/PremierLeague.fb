@@ -1,0 +1,28 @@
+footballsite PremierLeagueResults {
+
+  navigation {
+    Germany;
+    England;
+  }
+
+  country England {
+    league PremierLeague season "2025-2026" {
+      match {
+        date    "2026-02-14"
+        time    "17:30"
+        home    "Arsenal"              ("London")
+        away    "Manchester City"      ("Manchester")
+        score   1 - 0
+        stadium "Emirates Stadium"
+      }
+      match {
+        date    "2026-02-14"
+        time    "20:00"
+        home    "Liverpool"            ("Liverpool")
+        away    "Chelsea"              ("London")
+        score   2 - 2
+        stadium "Anfield"
+      }
+    }
+  }
+}

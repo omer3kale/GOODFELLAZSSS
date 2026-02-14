@@ -1,0 +1,15 @@
+pluginManagement {
+    repositories {
+        mavenLocal()
+        gradlePluginPortal()
+        maven {
+            name = 'RWTH-MontiCore'
+            url  = 'https://nexus.se.rwth-aachen.de/content/groups/public/'
+        }
+    }
+}
+
+rootProject.name = 'MCFootball'
+
+include ':mcfootball-generator'
+include ':mcfootball-backend'

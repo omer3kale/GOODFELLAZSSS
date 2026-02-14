@@ -1,0 +1,52 @@
+/* (c) ömer3kale – MCFootball – Open Source */
+package football;
+
+/**
+ * FootballSite grammar — Minimal Football DSL (DESIGN.md §4).
+ *
+ * Extends:
+ *   MCBasics         → Name, whitespace handling
+ *   MCCommonLiterals → String, Nat (scores, dates, times as strings)
+ *
+ * Nonterminals:
+ *   FootballSite  — root: named site containing navigation + countries
+ *   Navigation    — ordered list of country names for the nav bar
+ *   Country       — a country scope containing one or more leagues
+ *   League        — a named league with a season string and matches
+ *   Match         — a single match: date, time, teams, score, stadium
+ */
+grammar FootballSite extends de.monticore.MCBasics,
+                              de.monticore.literals.MCCommonLiterals {
+
+  /** Root: one football site with a name, optional nav, 1+ countries. */
+  symbol scope FootballSite =
+    "footballsite" Name "{" Navigation? Country+ "}";
+
+  /** Top-level navigation listing country links. */
+  Navigation =
+    "navigation" "{" NavigationItem (";" NavigationItem)* ";"? "}";
+
+  /** A single navigation entry referencing a country by name. */
+  NavigationItem =
+    Name;
+
+  /** A country containing one or more leagues. */
+  symbol scope Country =
+    "country" Name "{" League+ "}";
+
+  /** A named league with a season label and zero or more matches. */
+  symbol League =
+    "league" Name "season" season:String "{" Match* "}";
+
+  /** A single match with all key data fields. */
+  Match =
+    "match" "{"
+      "date"    matchDate:String
+      "time"    matchTime:String
+      "home"    homeTeam:String    "(" homeCity:String ")"
+      "away"    awayTeam:String    "(" awayCity:String ")"
+      "score"   homeScore:NatLiteral "-" awayScore:NatLiteral
+      "stadium" stadium:String
+    "}";
+
+}

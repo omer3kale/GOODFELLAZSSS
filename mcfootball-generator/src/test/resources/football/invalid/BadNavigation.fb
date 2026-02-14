@@ -1,0 +1,21 @@
+/* Invalid model: triggers NavigationCountryExists and LeagueNameStartUpperCase */
+footballsite BadNavigationTest {
+
+  navigation {
+    Germany;
+    France;
+  }
+
+  country Germany {
+    league bundesliga season "2025-2026" {
+      match {
+        date    "2026-02-15"
+        time    "15:30"
+        home    "Bayern München"       ("Munich")
+        away    "Borussia Dortmund"    ("Dortmund")
+        score   2 - 1
+        stadium "Allianz Arena"
+      }
+    }
+  }
+}

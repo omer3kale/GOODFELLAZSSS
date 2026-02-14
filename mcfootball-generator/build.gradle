@@ -1,0 +1,119 @@
+/* ─────────────────────────────────────────────────────────────────────
+ * mcfootball-generator — build.gradle
+ * MontiCore 7.7.0-SNAPSHOT DSL + static HTML generator.
+ *
+ * The "de.monticore.generator" plugin automatically:
+ *   • finds all .mc4 grammars in src/main/grammars/
+ *   • creates a "generateMCGrammars" task
+ *   • wires generated sources into compileJava
+ * See: https://github.com/MontiCore/monticore/blob/dev/docs/Gradle.md
+ * ───────────────────────────────────────────────────────────────────── */
+
+plugins {
+    id 'java-library'
+    id 'application'
+    id 'de.monticore.generator' version "$mc_version"
+}
+
+application {
+    mainClass = 'football.FootballSiteTool'
+}
+
+dependencies {
+    // MontiCore grammar jars — provides MCBasics, MCCommonLiterals, etc.
+    // The "grammar" configuration is created by the MontiCore plugin.
+    grammar "de.monticore:monticore-grammar:${mc_version}"
+
+    // MontiCore runtime — needed by all generated code
+    implementation "de.monticore:monticore-runtime:${mc_version}"
+    implementation "de.monticore:monticore-grammar:${mc_version}"
+
+    // SE-commons — logging + utilities used by MontiCore
+    implementation "de.se_rwth.commons:se-commons-logging:${se_commons_version}"
+    implementation "de.se_rwth.commons:se-commons-utilities:${se_commons_version}"
+
+    // FreeMarker — template engine for HTML generation
+    implementation "org.freemarker:freemarker:2.3.32"
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * generateSite — parse .fb models and emit static HTML into output/
+ *
+ * Depends on 'classes' so that:
+ *   1. MontiCore has generated the parser/AST from FootballSite.mc4
+ *   2. Our handwritten FootballSiteGenerator is compiled
+ *
+ * Usage:  ./gradlew :mcfootball-generator:generateSite
+ * ───────────────────────────────────────────────────────────────────── */
+task generateSite(type: JavaExec) {
+    description = 'Generate static HTML site from hand-written .fb test models'
+    group = 'application'
+
+    dependsOn classes
+
+    classpath = sourceSets.main.runtimeClasspath
+
+    mainClass = 'football.FootballSiteTool'
+
+    // Pass model files and output dir as program arguments
+    args = [
+        '--models',
+        file('src/test/resources/football/valid/Bundesliga.fb').absolutePath,
+        file('src/test/resources/football/valid/PremierLeague.fb').absolutePath,
+        '--output',
+        file('output').absolutePath
+    ]
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * generateSiteFromModels — read all .fb files from models/generated/
+ *
+ * This is the task used in the backend → generator pipeline:
+ *   1. Backend writes .fb files into ${rootProject}/models/generated/
+ *   2. This task reads them all and generates HTML into output/
+ *
+ * Usage:  ./gradlew :mcfootball-generator:generateSiteFromModels
+ * ───────────────────────────────────────────────────────────────────── */
+task generateSiteFromModels(type: JavaExec) {
+    description = 'Generate static HTML site from models/generated/*.fb'
+    group = 'application'
+
+    dependsOn classes
+
+    classpath = sourceSets.main.runtimeClasspath
+
+    mainClass = 'football.FootballSiteTool'
+
+    args = [
+        '--models-dir',
+        rootProject.file('models/generated').absolutePath,
+        '--output',
+        file('output').absolutePath
+    ]
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * generateSiteProd — production mode: single AllEurope.fb → HTML
+ *
+ * Uses --model (not --models-dir) for fail-fast behavior.
+ * Depends only on 'classes' — no tests, no extra tasks.
+ *
+ * Usage:  ./gradlew :mcfootball-generator:generateSiteProd
+ * ───────────────────────────────────────────────────────────────────── */
+task generateSiteProd(type: JavaExec) {
+    description = 'Generate static HTML site from models/generated/AllEurope.fb (production)'
+    group = 'application'
+
+    dependsOn classes
+
+    classpath = sourceSets.main.runtimeClasspath
+
+    mainClass = 'football.FootballSiteTool'
+
+    args = [
+        '--model',
+        rootProject.file('models/generated/AllEurope.fb').absolutePath,
+        '--output',
+        file("$buildDir/generated/site").absolutePath
+    ]
+}

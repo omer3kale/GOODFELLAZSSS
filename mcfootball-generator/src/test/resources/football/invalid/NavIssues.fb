@@ -1,0 +1,38 @@
+/* Invalid test file — triggers:
+ *   0xFC010  NavigationNoDuplicates        ("Germany" appears twice in nav)
+ *   0xFC011  CountryNameStartUpperCase     ("germany" starts lowercase — but
+ *            Name in MontiCore grammar starts uppercase so this needs a
+ *            workaround; instead we test nav duplicates and missing-nav)
+ *   0xFC012  NavigationMatchesAllCountries ("England" not in nav)
+ */
+footballsite NavIssues {
+
+  navigation { Germany; Germany; }
+
+  country Germany {
+    league Bundesliga season "2025-2026" {
+      match {
+        date    "2026-02-15"
+        time    "15:30"
+        home    "Bayern München"    ("Munich")
+        away    "Borussia Dortmund" ("Dortmund")
+        score   2 - 1
+        stadium "Allianz Arena"
+      }
+    }
+  }
+
+  country England {
+    league PremierLeague season "2025-2026" {
+      match {
+        date    "2026-02-15"
+        time    "15:00"
+        home    "Arsenal"         ("London")
+        away    "Manchester City" ("Manchester")
+        score   1 - 1
+        stadium "Emirates Stadium"
+      }
+    }
+  }
+
+}

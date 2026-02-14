@@ -1,0 +1,36 @@
+/* ─────────────────────────────────────────────────────────────────────
+ * MCFootball — root build.gradle
+ * Multi-module Gradle project.
+ *
+ * Subprojects:
+ *   :mcfootball-generator  — MontiCore DSL + static HTML generator
+ *   :mcfootball-backend    — Spring Boot backend (future)
+ *
+ * Common settings (Java 11, repos, version properties) are defined
+ * here and inherited by both subprojects.
+ * ───────────────────────────────────────────────────────────────────── */
+
+// ── Common configuration for all subprojects ───────────────────────
+subprojects {
+    apply plugin: 'java'
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven {
+            name = 'RWTH-MontiCore'
+            url  = 'https://nexus.se.rwth-aachen.de/content/groups/public/'
+        }
+        // TODO: add your own Maven repo here when you publish custom artifacts
+        // maven { url = 'https://your-repo-url' }
+    }
+
+    dependencies {
+        testImplementation "junit:junit:${junit_version}"
+    }
+}

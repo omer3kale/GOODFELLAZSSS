@@ -1,0 +1,27 @@
+# ─────────────────────────────────────────────────────────────────────
+# MCFootball Backend configuration
+# ─────────────────────────────────────────────────────────────────────
+
+server:
+  port: 8080
+
+mcfootball:
+  api:
+    season: "2025"
+    min-success-rate: 0.5        # at least 50% of leagues must succeed
+    countries:
+      - name: Germany
+        code: DE
+        leagues:
+          - name: Bundesliga
+            id: "78"
+      - name: England
+        code: GB
+        leagues:
+          - name: PremierLeague
+            id: "39"
+      - name: Spain
+        code: ES
+        leagues:
+          - name: LaLiga
+            id: "140"
