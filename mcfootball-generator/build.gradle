@@ -52,7 +52,7 @@ dependencies {
     implementation "de.se_rwth.commons:se-commons-utilities:${se_commons_version}"
 
     // FreeMarker — template engine for HTML generation
-    implementation "org.freemarker:freemarker:2.3.32"
+    implementation "org.freemarker:freemarker:2.3.34"
 }
 
 /* ─────────────────────────────────────────────────────────────────────
