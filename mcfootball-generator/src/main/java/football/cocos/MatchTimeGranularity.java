@@ -10,6 +10,11 @@ import java.util.regex.Pattern;
 /**
  * CoCo 0xFC025: Match times should use standard football kick-off granularity.
  * Minutes must be 00, 15, 30, or 45.
+ *
+ * <p><strong>Collision buddy:</strong> This CoCo can fire alongside
+ * {@link MatchTimeFormatIsValid} (0xFC007) when a time has BOTH an invalid
+ * hour AND non-standard minutes (e.g. "25:10" → 0xFC007 + 0xFC025).
+ * This is intentional and serves as a teaching example of complementary checks.
  */
 public class MatchTimeGranularity implements FootballSiteASTMatchCoCo {
 

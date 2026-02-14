@@ -5,8 +5,13 @@ import football.footballsite._cocos.FootballSiteASTMatchCoCo;
 import de.se_rwth.commons.logging.Log;
 
 /**
- * CoCo: Match string fields (homeTeam, awayTeam, homeCity, awayCity, stadium)
- * must not be empty.
+ * CoCo 0xFC008: Match string fields (homeTeam, awayTeam, homeCity, awayCity, stadium)
+ * must not be empty (zero-length).
+ *
+ * <p>This checks for truly empty strings ({@code ""}). Whitespace-only strings
+ * (e.g. {@code " "}) are handled separately by
+ * {@link CityNameNotBlank} (0xFC023) for cities
+ * and {@link StadiumNameMinLength} (0xFC014) for stadiums.
  */
 public class MatchFieldsNotEmpty implements FootballSiteASTMatchCoCo {
 
@@ -20,7 +25,7 @@ public class MatchFieldsNotEmpty implements FootballSiteASTMatchCoCo {
     }
 
     private void checkField(ASTMatch node, String value, String fieldName) {
-        if (value == null || value.trim().isEmpty()) {
+        if (value == null || value.isEmpty()) {
             Log.error("0xFC008 Empty '" + fieldName
                     + "' in match at " + node.get_SourcePositionStart()
                     + ". All match fields must be non-empty.");

@@ -1,6 +1,6 @@
 # MCFootball — Owner Self-Check Report & QA Handover
 
-**Date:** 2026-02-14 (updated 2026-02-14)  
+**Date:** 2026-02-14 (updated 2026-02-15)  
 **Branch:** `main`  
 **Build System:** Gradle 7.6.4 / JDK 11 / MontiCore 7.7.0-SNAPSHOT  
 **Test Framework:** JUnit 4.13.2 / JaCoCo 0.8.11
@@ -13,6 +13,7 @@
 - Clean build: `./gradlew :mcfootball-generator:clean :mcfootball-generator:build :mcfootball-generator:generateSiteProd`
 - **Result:** BUILD SUCCESSFUL, 0 MontiCore errors, 0 warnings
 - **CoCos:** "all checks passed" (27 CoCo checkers registered, 0xFC001–0xFC027)
+- **CoCo de-conflicting:** 0xFC008 (`MatchFieldsNotEmpty`) narrowed to truly-empty strings (`.isEmpty()`); whitespace-only handled by 0xFC023 (`CityNameNotBlank`)
 - **Edge-case test:** Added temp match with heavy Unicode (`1. FC Köln` vs `Bayern München`, stadium `RheinEnergieStadion`) — parsed and CoCos passed. Removed after verification.
 
 ### Task 2 — Unicode & Special Characters ✅
@@ -98,7 +99,7 @@
 
 ### Task 17 — Coverage Report & Risk Summary ✅
 - **JaCoCo report:** `mcfootball-generator/build/reports/jacoco/test/html/`
-- **Total tests:** 60 across 6 test classes — 60/60 PASS
+- **Total tests:** 79 across 6 test classes — 79/79 PASS
 - **Overall project coverage:** 15% instructions / 7% branches (includes massive MontiCore-generated code)
 - **Handwritten code coverage:**
 
@@ -128,28 +129,62 @@
 | 10 | `testBrandNameRegressionGOODFELLAZßS` | Brand ≥2× per HTML, no old brand leakage |
 
 ### CoCo Extended Range Tests (CoCoExtendedRangeTest.java) ✅
-- **Test class:** `CoCoExtendedRangeTest.java` — 14 tests
-- **Result:** 14/14 PASS
+- **Test class:** `CoCoExtendedRangeTest.java` — 33 tests
+- **Result:** 33/33 PASS
 - **CoCo range extended:** 0xFC001–0xFC012 → 0xFC001–0xFC027 (15 new CoCos)
 - **New invalid test models (11):** `MatchDateOutOfSeason.fb`, `ShortStadiumName.fb`, `EmptyLeague.fb`, `DuplicateMatch.fb`, `ScoreUpperBound.fb`, `LongCountryName.fb`, `LongLeagueName.fb`, `BlankCity.fb`, `NonConsecutiveSeason.fb`, `OddTimeMinutes.fb`, `MixedSeasons.fb`
-- **Notes:** 0xFC015 (CountryHasAtLeastOneLeague) and 0xFC018 (NavigationNotEmpty) not testable via .fb — grammar enforces `Country → League+` and `Navigation → NavigationItem+`. 0xFC019 (ScoreNonNegative) not testable — `NatLiteral` is unsigned. 0xFC027 tested programmatically (381-match model).
+- **Grammar-unreachable CoCos (defensive only):** 0xFC015 (`CountryHasAtLeastOneLeague` — grammar `Country → League+`), 0xFC018 (`NavigationNotEmpty` — grammar `NavigationItem+`), 0xFC019 (`ScoreNonNegative` — `NatLiteral` unsigned)
+- **Collision pair (teaching example):** 0xFC007 + 0xFC025 on time `"25:10"` — hour 25 fails format check, minutes 10 fails granularity check → both fire simultaneously
+- **De-conflicting:** 0xFC008 (`MatchFieldsNotEmpty`) uses `.isEmpty()` (truly empty only); 0xFC023 (`CityNameNotBlank`) handles whitespace-only `" "` — no overlap
+- **Test structure:** 12 positive + 12 negative (one per reachable CoCo) + 6 teaching + 2 all-pass sanity + 1 collision demo = 33
 
-| # | Test | CoCo Code | Covers |
-|---|------|-----------|--------|
-| 1 | `testMatchDateOutOfSeason` | 0xFC013 | Match year 2027 outside season 2025-2026 |
-| 2 | `testShortStadiumName` | 0xFC014 | Stadium "AB" (2 chars < 3 min) |
-| 3 | `testEmptyLeague` | 0xFC016 | League block with zero matches |
-| 4 | `testDuplicateMatch` | 0xFC017 | Two matches with identical date/time/home/away |
-| 5 | `testScoreUpperBound` | 0xFC020 | Score 100 exceeds 99 limit |
-| 6 | `testLongCountryName` | 0xFC021 | Country name 41 chars (> 40 limit) |
-| 7 | `testLongLeagueName` | 0xFC022 | League name 41 chars (> 40 limit) |
-| 8 | `testBlankCity` | 0xFC023 | City " " is whitespace-only |
-| 9 | `testNonConsecutiveSeason` | 0xFC024 | Season "2025-2027" (2-year gap) |
-| 10 | `testOddTimeMinutes` | 0xFC025 | Time "15:07" not in {00,15,30,45} |
-| 11 | `testMixedSeasons` | 0xFC026 | Two leagues with different seasons in one country |
-| 12 | `testTooManyMatches` | 0xFC027 | 381 matches exceeds 380 limit |
-| 13 | `testAllCoCosPassOnTinyTest` | all 27 | TinyTest.fb triggers 0 errors |
-| 14 | `testAllCoCosPassOnBundesliga` | all 27 | Bundesliga.fb triggers 0 errors |
+#### Positive Tests (CoCo does NOT fire on valid input)
+
+| # | Test | CoCo Code | Validates |
+|---|------|-----------|----------|
+| 1 | `testPos_MatchDateWithinSeason` | 0xFC013 | Date 2025-09-15 inside 2025-2026 |
+| 2 | `testPos_StadiumNameMinLength` | 0xFC014 | Stadium "ABC" (3 chars = minimum) |
+| 3 | `testPos_LeagueHasAtLeastOneMatch` | 0xFC016 | League with 1 match |
+| 4 | `testPos_UniqueMatchPerLeague` | 0xFC017 | Two matches with different times |
+| 5 | `testPos_ScoreReasonableUpperBound` | 0xFC020 | Score 99 (at boundary) |
+| 6 | `testPos_CountryNameLengthLimit` | 0xFC021 | 40-char country name (at boundary) |
+| 7 | `testPos_LeagueNameLengthLimit` | 0xFC022 | 40-char league name (at boundary) |
+| 8 | `testPos_CityNameNotBlank` | 0xFC023 | City "Berlin" (non-blank) |
+| 9 | `testPos_SeasonYearsConsecutive` | 0xFC024 | Season "2025-2026" (consecutive) |
+| 10 | `testPos_MatchTimeGranularity` | 0xFC025 | Time "18:15" (valid 15-min step) |
+| 11 | `testPos_LeagueSeasonConsistent` | 0xFC026 | Two leagues, both 2025-2026 |
+| 12 | `testPos_MaxMatchesPerLeague` | 0xFC027 | 380 matches (at boundary) |
+
+#### Negative Tests (CoCo fires on invalid input)
+
+| # | Test | CoCo Code | Triggers |
+|---|------|-----------|----------|
+| 13 | `testNeg_MatchDateOutOfSeason` | 0xFC013 | Date 2027-03-15 outside 2025-2026 |
+| 14 | `testNeg_ShortStadiumName` | 0xFC014 | Stadium "AB" (2 chars < 3 min) |
+| 15 | `testNeg_EmptyLeague` | 0xFC016 | League with zero matches |
+| 16 | `testNeg_DuplicateMatch` | 0xFC017 | Two identical date/time/home/away |
+| 17 | `testNeg_ScoreUpperBound` | 0xFC020 | Score 100 exceeds 99 |
+| 18 | `testNeg_LongCountryName` | 0xFC021 | 41-char country name |
+| 19 | `testNeg_LongLeagueName` | 0xFC022 | 41-char league name |
+| 20 | `testNeg_BlankCity` | 0xFC023 | City " " whitespace-only |
+| 21 | `testNeg_NonConsecutiveSeason` | 0xFC024 | Season "2025-2027" (2-year gap) |
+| 22 | `testNeg_OddTimeMinutes` | 0xFC025 | Time "15:07" not in {00,15,30,45} |
+| 23 | `testNeg_MixedSeasons` | 0xFC026 | Two leagues with different seasons |
+| 24 | `testNeg_TooManyMatches` | 0xFC027 | 381 matches exceeds 380 |
+
+#### Teaching & Boundary Tests
+
+| # | Test | Concept |
+|---|------|---------|
+| 25 | `testSeasonYearsConsecutive_ValidAndInvalid` | 0xFC024 side-by-side: "2025-2026" OK vs "2025-2027" fires |
+| 26 | `testMatchTimeGranularity_Valid15MinSteps` | 0xFC025: 15:00/18:15/20:30/21:45 OK vs 18:10 fires |
+| 27 | `testCountryAndLeagueNameLengthLimits` | 0xFC021/0xFC022: 40ch OK vs 41ch fires |
+| 28 | `testCityNameNotBlankVsEmptyField` | 0xFC023 vs 0xFC008: " " fires 0xFC023, "" fires 0xFC008 |
+| 29 | `testLeagueSeasonConsistencyWithinCountry` | 0xFC026: same season OK vs different fires |
+| 30 | `testMaxMatchesPerLeagueBoundary` | 0xFC027: 380 OK vs 381 fires |
+| 31 | `testAllCoCosPassOnTinyTest` | All 27 CoCos pass on TinyTest.fb |
+| 32 | `testAllCoCosPassOnBundesliga` | All 27 CoCos pass on Bundesliga.fb |
+| 33 | `testCollisionDemo_TimeFormatAndGranularity` | 0xFC007 + 0xFC025 both fire on "25:10" |
 
 #### Complete CoCo Registry (27 codes)
 
@@ -189,7 +224,7 @@
 
 ### High-Risk Areas
 1. **`FootballSiteTool.main()`** — 0% coverage. Uses `System.exit()` which prevents direct JUnit testing. **Recommendation:** Refactor to return exit codes instead of calling `System.exit()`, then add tests for CLI argument parsing, missing-file handling, and production vs. dev mode switching.
-2. **CoCo branch coverage** — 27 CoCos now covered via `CoCoExtendedRangeTest` (14 tests) + existing negative tests. Most branches exercised. **Recommendation:** Inspect JaCoCo report for any remaining uncovered branches.
+2. **CoCo branch coverage** — 27 CoCos now covered via `CoCoExtendedRangeTest` (33 tests) + existing negative tests. All reachable CoCos have positive + negative test pairs. **Recommendation:** Inspect JaCoCo report for any remaining uncovered branches.
 3. **SNAPSHOT dependencies** — `monticore-grammar:7.7.0-SNAPSHOT` and `se-commons:7.7.0-SNAPSHOT` are not reproducible releases. **Recommendation:** Pin to stable releases before production deployment.
 
 ### Medium-Risk Areas
@@ -209,11 +244,11 @@
 - **Coverage:** 5 European countries × 3 leagues = 15 leagues, 85 matches, 21 HTML pages
 - **Brand:** GOODFELLAZßS (three-color: white bg, black header/footer, red brand/scores, light blue team names)
 - **Grammar:** MontiCore 7.7.0-SNAPSHOT with custom Name token supporting Unicode Latin Extended (U+00C0–U+017F)
-- **Tests:** 46 unit tests (5 test classes), JaCoCo coverage, OSS license audit
+- **Tests:** 79 unit tests (6 test classes), JaCoCo coverage, OSS license audit
 
 ### What Has Been Verified (Owner)
 - Grammar builds and parses without errors or warnings
-- All 12 CoCo constraint checkers pass
+- All 27 CoCo constraint checkers pass (0xFC001–0xFC027)
 - Unicode renders correctly in HTML (umlauts, ß, accents)
 - Extended Name token accepts Unicode identifiers (Österreich, Córdoba, etc.)
 - Brand "GOODFELLAZßS" present on all 21 pages (header + footer)
@@ -221,7 +256,7 @@
 - 211 internal links — 0 broken
 - 85 matches — all valid dates, times, scores, no duplicates, no self-play
 - CI workflow correct (`pages.yml`)
-- **46 unit tests pass** (parsing, CoCos, generation, golden-master, fuzz, error handling, domain tests)
+- **79 unit tests pass** (parsing, CoCos, generation, golden-master, fuzz, error handling, domain tests, extended CoCo range)
 - **Code coverage:** 96–97% on handwritten cocos/generator code
 - **OSS audit:** No license conflicts (see `OSS-NOTICE.md`)
 
@@ -240,4 +275,4 @@
 
 ---
 
-*Generated by owner self-check on 2026-02-14. Tasks 12–17 added on 2026-02-14. 10 additional domain tests added on 2026-02-14. Ready for QA handoff.*
+*Generated by owner self-check on 2026-02-14. Tasks 12–17 added on 2026-02-14. 10 additional domain tests added on 2026-02-14. CoCo stabilization (de-conflicting, 33 extended tests, collision pair documentation) on 2026-02-15. Ready for QA handoff.*

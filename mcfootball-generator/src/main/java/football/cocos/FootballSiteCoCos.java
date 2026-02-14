@@ -65,17 +65,17 @@ public class FootballSiteCoCos {
         // ── Phase 6 — extended CoCos (0xFC013–0xFC027) ───────────────
         checker.addCoCo(new MatchDateWithinSeason());        // 0xFC013
         checker.addCoCo(new StadiumNameMinLength());         // 0xFC014
-        checker.addCoCo(new CountryHasAtLeastOneLeague());   // 0xFC015
+        checker.addCoCo(new CountryHasAtLeastOneLeague());   // 0xFC015  (grammar-unreachable, defensive)
         checker.addCoCo(new LeagueHasAtLeastOneMatch());     // 0xFC016
         checker.addCoCo(new UniqueMatchPerLeague());         // 0xFC017
-        checker.addCoCo(new NavigationNotEmpty());           // 0xFC018
-        checker.addCoCo(new ScoreNonNegative());             // 0xFC019
+        checker.addCoCo(new NavigationNotEmpty());           // 0xFC018  (grammar-unreachable, defensive)
+        checker.addCoCo(new ScoreNonNegative());             // 0xFC019  (grammar-unreachable, defensive)
         checker.addCoCo(new ScoreReasonableUpperBound());    // 0xFC020
         checker.addCoCo(new CountryNameLengthLimit());       // 0xFC021
         checker.addCoCo(new LeagueNameLengthLimit());        // 0xFC022
         checker.addCoCo(new CityNameNotBlank());             // 0xFC023
         checker.addCoCo(new SeasonYearsConsecutive());       // 0xFC024
-        checker.addCoCo(new MatchTimeGranularity());         // 0xFC025
+        checker.addCoCo(new MatchTimeGranularity());         // 0xFC025  (collision buddy: 0xFC007)
         checker.addCoCo(new LeagueSeasonConsistentWithinCountry()); // 0xFC026
         checker.addCoCo(new MaxMatchesPerLeague());          // 0xFC027
 

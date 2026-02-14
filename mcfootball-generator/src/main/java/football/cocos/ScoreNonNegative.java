@@ -6,8 +6,11 @@ import de.se_rwth.commons.logging.Log;
 
 /**
  * CoCo 0xFC019: Match scores must be non-negative (≥ 0).
- * NatLiteral in MontiCore is unsigned, so this is a safety guard
- * for any future grammar changes or manual AST construction.
+ *
+ * <p><strong>Grammar-unreachable:</strong> {@code NatLiteral} in MontiCore is
+ * unsigned by definition, so negative values cannot appear in parsed .fb files.
+ * This CoCo exists as a defensive guard ("spec contract") for programmatic
+ * AST construction where scores might be set via setters.
  */
 public class ScoreNonNegative implements FootballSiteASTMatchCoCo {
 
