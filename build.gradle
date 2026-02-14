@@ -33,4 +33,18 @@ subprojects {
     dependencies {
         testImplementation "junit:junit:${junit_version}"
     }
+
+    // ── UTF-8 everywhere — ensures European characters (ß, ü, ö, é, ñ)
+    //    compile and render correctly across all platforms ────────────
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
+
+    tasks.withType(Test) {
+        systemProperty 'file.encoding', 'UTF-8'
+    }
+
+    tasks.withType(Javadoc) {
+        options.encoding = 'UTF-8'
+    }
 }
