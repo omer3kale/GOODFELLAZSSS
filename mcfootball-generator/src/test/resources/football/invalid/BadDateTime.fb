@@ -1,0 +1,22 @@
+/* Invalid test file — triggers:
+ *   0xFC006  MatchDateFormatIsValid   ("2026-13-40" — month 13, day 40)
+ *   0xFC007  MatchTimeFormatIsValid   ("99:99" — invalid time)
+ */
+footballsite BadDateTimeTest {
+
+  navigation { England; }
+
+  country England {
+    league PremierLeague season "2025-2026" {
+      match {
+        date    "2026-13-40"
+        time    "99:99"
+        home    "Arsenal"          ("London")
+        away    "Chelsea"          ("London")
+        score   1 - 0
+        stadium "Emirates Stadium"
+      }
+    }
+  }
+
+}

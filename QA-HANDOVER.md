@@ -1,8 +1,9 @@
 # MCFootball — Owner Self-Check Report & QA Handover
 
-**Date:** 2026-02-14  
-**Branch:** `main` (6 commits ahead of origin)  
-**Build System:** Gradle 7.6.4 / JDK 11 / MontiCore 7.7.0-SNAPSHOT
+**Date:** 2026-02-14 (updated 2026-02-14)  
+**Branch:** `main`  
+**Build System:** Gradle 7.6.4 / JDK 11 / MontiCore 7.7.0-SNAPSHOT  
+**Test Framework:** JUnit 4.13.2 / JaCoCo 0.8.11
 
 ---
 
@@ -62,6 +63,89 @@
 
 ---
 
+## Self-Check Report (Tasks 12–17) — Code & Test Coverage
+
+### Task 12 — Unit Test Coverage ✅
+- **Test class:** `FootballSiteToolTest.java` — 19 tests
+- **Scope:** Valid parsing (3), CoCo positive (2), CoCo negative (7), generator output (3), `toSlug()` utility (4)
+- **Result:** 19/19 PASS
+- **Coverage (handwritten code):**
+  - `football.cocos` — 96% instructions / 85% branches
+  - `football.generator` — 97% instructions / 100% branches
+  - `football.FootballSiteTool` — 0% (uses `System.exit()`, untestable without refactoring)
+
+### Task 13 — Golden-Master / Snapshot Tests ✅
+- **Test class:** `GoldenMasterTest.java` — 6 tests
+- **Scope:** Structural validation of generated HTML — index page structure, country page structure, league page structure, match count verification, brand presence, no old brand leakage ("GOODFELLAZFß")
+- **Result:** 6/6 PASS
+- **Baseline model:** `TinyTest.fb` (1 country, 1 league, 2 matches)
+
+### Task 14 — Property-Based / Fuzz Tests ✅
+- **Test class:** `GrammarFuzzTest.java` — 5 tests
+- **Scope:** 20 random valid models (seeded Random(42)), 20 random CoCo runs, boundary scores (0-0, 9-9), boundary dates (Jan 1/Dec 31), heavy Unicode (`Köln`, `München`, `Córdoba`, `São Paulo`, `Łódź`)
+- **Result:** 5/5 PASS — parser and CoCos never crash on random valid input
+
+### Task 15 — Open-Source & License Risk Audit ✅
+- **Output:** `OSS-NOTICE.md`
+- **Dependencies audited:** 7 (5 runtime, 2 test-only)
+- **Licenses found:** BSD-3-Clause (MontiCore, SE-Commons), Apache-2.0 (FreeMarker), EPL-2.0 (JUnit, JaCoCo)
+- **Result:** No GPL/copyleft dependencies. No license conflicts. SNAPSHOT versions noted as risk for reproducibility.
+
+### Task 16 — Error Handling & Failure Modes ✅
+- **Test class:** `ErrorHandlingTest.java` — 6 tests
+- **Scope:** Missing file handling, malformed model parsing, partial model parsing, empty file parsing, output directory creation, multi-error CoCo reporting (≥2 errors detected)
+- **Result:** 6/6 PASS — all failure paths handled gracefully (no uncaught exceptions)
+
+### Task 17 — Coverage Report & Risk Summary ✅
+- **JaCoCo report:** `mcfootball-generator/build/reports/jacoco/test/html/`
+- **Total tests:** 46 across 5 test classes — 46/46 PASS
+- **Overall project coverage:** 15% instructions / 7% branches (includes massive MontiCore-generated code)
+- **Handwritten code coverage:**
+
+| Package              | Instructions | Branches |
+|----------------------|-------------|----------|
+| `football.cocos`     | 96%         | 85%      |
+| `football.generator` | 97%         | 100%     |
+| `football` (Tool)    | 0%          | 0%       |
+
+### Additional 10 Domain Tests (ExtendedDomainTest.java) ✅
+- **Test class:** `ExtendedDomainTest.java` — 10 tests
+- **Result:** 10/10 PASS
+- **Test models added:** 4 valid (`MultiCountry.fb`, `BoundaryScores.fb`, `LongTeamNames.fb`, `MixedUnicode.fb`) + 3 invalid (`InvalidNavCountry.fb`, `ShortSeason.fb`, `DuplicateLeague.fb`)
+- **Test summary:**
+
+| # | Test | Covers |
+|---|------|--------|
+| 1 | `testCrossCountryNavigationIntegrity` | Index → country → league link chain, all pages exist |
+| 2 | `testLeagueMatchCountMatchesModel` | Rendered match rows = model match blocks (3, 2, 1) |
+| 3 | `testBoundaryScoresAreAccepted` | Scores 0-0 and 9-9 pass CoCos and render |
+| 4 | `testInvalidNavigationCountryTriggersCoCo` | 0xFC004 fires for undeclared "Portugal" |
+| 5 | `testInvalidSeasonFormatCoCo` | 0xFC009 fires for "25-26" (not YYYY-YYYY) |
+| 6 | `testTimeFormatBoundaryValues` | 00:00 OK, 23:59 OK, 24:00 triggers 0xFC007 |
+| 7 | `testDuplicateLeagueNameCoCo` | 0xFC005 fires for two Bundesliga in one country |
+| 8 | `testLongTeamNamesRenderCorrectly` | 72-char team names render, HTML stays valid |
+| 9 | `testMixedUnicodeTeamNames` | DE/ES/FR/PT Unicode in identifiers + strings |
+| 10 | `testBrandNameRegressionGOODFELLAZßS` | Brand ≥2× per HTML, no old brand leakage |
+
+---
+
+## Risk Hotspots & Recommendations
+
+### High-Risk Areas
+1. **`FootballSiteTool.main()`** — 0% coverage. Uses `System.exit()` which prevents direct JUnit testing. **Recommendation:** Refactor to return exit codes instead of calling `System.exit()`, then add tests for CLI argument parsing, missing-file handling, and production vs. dev mode switching.
+2. **CoCo branch coverage at 85%** — Some CoCo validators have branches that are hard to trigger (e.g., navigating edge cases in `NavigationMatchesAllCountries`). **Recommendation:** Add more invalid test models targeting uncovered branches.
+3. **SNAPSHOT dependencies** — `monticore-grammar:7.7.0-SNAPSHOT` and `se-commons:7.7.0-SNAPSHOT` are not reproducible releases. **Recommendation:** Pin to stable releases before production deployment.
+
+### Medium-Risk Areas
+4. **FreeMarker template errors** — Templates are not unit-tested for missing variable handling (e.g., if a league has 0 matches). **Recommendation:** Add a test with an empty league to verify template gracefully renders an empty table.
+5. **Concurrent generation** — `FootballSiteGenerator` is not thread-safe. **Recommendation:** Document single-threaded usage constraint or add synchronization if parallel generation is planned.
+
+### Low-Risk Areas
+6. **Unicode edge cases** — Tested with Latin Extended (ä, ö, ü, ß, ñ, ó, ł) but not with CJK, emoji, or RTL scripts. **Recommendation:** If non-Latin leagues are planned, extend Name token further and add test models.
+7. **Large dataset performance** — Tested with 85 matches (15 leagues). Not tested with 100+ leagues or 1000+ matches. **Recommendation:** Add a stress test if scaling is planned.
+
+---
+
 ## QA Handover
 
 ### Scope
@@ -69,6 +153,7 @@
 - **Coverage:** 5 European countries × 3 leagues = 15 leagues, 85 matches, 21 HTML pages
 - **Brand:** GOODFELLAZßS (three-color: white bg, black header/footer, red brand/scores, light blue team names)
 - **Grammar:** MontiCore 7.7.0-SNAPSHOT with custom Name token supporting Unicode Latin Extended (U+00C0–U+017F)
+- **Tests:** 46 unit tests (5 test classes), JaCoCo coverage, OSS license audit
 
 ### What Has Been Verified (Owner)
 - Grammar builds and parses without errors or warnings
@@ -80,6 +165,9 @@
 - 211 internal links — 0 broken
 - 85 matches — all valid dates, times, scores, no duplicates, no self-play
 - CI workflow correct (`pages.yml`)
+- **46 unit tests pass** (parsing, CoCos, generation, golden-master, fuzz, error handling, domain tests)
+- **Code coverage:** 96–97% on handwritten cocos/generator code
+- **OSS audit:** No license conflicts (see `OSS-NOTICE.md`)
 
 ### What QA Should Test Next
 1. **Cross-browser rendering:** Chrome, Firefox, Safari, Edge — verify brand, colors, and Unicode characters render identically
@@ -96,4 +184,4 @@
 
 ---
 
-*Generated by owner self-check on 2026-02-14. Ready for QA handoff.*
+*Generated by owner self-check on 2026-02-14. Tasks 12–17 added on 2026-02-14. 10 additional domain tests added on 2026-02-14. Ready for QA handoff.*

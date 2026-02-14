@@ -1,0 +1,22 @@
+/* Invalid model: triggers 0xFC009 SeasonFormatIsValid
+ * — "25-26" does not match YYYY-YYYY format.
+ * All other fields are valid so only this CoCo should fire.
+ */
+footballsite ShortSeasonTest {
+
+  navigation { Germany; }
+
+  country Germany {
+    league Bundesliga season "25-26" {
+      match {
+        date    "2025-09-01"
+        time    "15:30"
+        home    "Bayern München"    ("Munich")
+        away    "Borussia Dortmund" ("Dortmund")
+        score   2 - 1
+        stadium "Allianz Arena"
+      }
+    }
+  }
+
+}

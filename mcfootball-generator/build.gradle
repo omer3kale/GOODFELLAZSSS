@@ -12,11 +12,28 @@
 plugins {
     id 'java-library'
     id 'application'
+    id 'jacoco'
     id 'de.monticore.generator' version "$mc_version"
 }
 
 application {
     mainClass = 'football.FootballSiteTool'
+}
+
+jacoco {
+    toolVersion = "0.8.11"
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        html.required = true
+        xml.required  = true
+    }
+}
+
+test {
+    finalizedBy jacocoTestReport
 }
 
 dependencies {

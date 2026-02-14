@@ -1,0 +1,88 @@
+/* Multi-country test: 2 countries × 2 leagues, varying match counts.
+ * Germany: Bundesliga (3 matches), Zweiteliga (2 matches)
+ * Spain:   LaLiga (2 matches), SegundaDivision (1 match)
+ * Total: 8 matches, 7 HTML pages.
+ */
+footballsite MultiCountryTest {
+
+  navigation { Germany; Spain; }
+
+  country Germany {
+    league Bundesliga season "2025-2026" {
+      match {
+        date    "2025-08-23"
+        time    "15:30"
+        home    "Bayern München"       ("Munich")
+        away    "Borussia Dortmund"    ("Dortmund")
+        score   2 - 1
+        stadium "Allianz Arena"
+      }
+      match {
+        date    "2025-09-20"
+        time    "18:30"
+        home    "RB Leipzig"           ("Leipzig")
+        away    "Bayer Leverkusen"     ("Leverkusen")
+        score   1 - 1
+        stadium "Red Bull Arena"
+      }
+      match {
+        date    "2025-10-04"
+        time    "15:30"
+        home    "Eintracht Frankfurt"  ("Frankfurt")
+        away    "VfB Stuttgart"        ("Stuttgart")
+        score   3 - 0
+        stadium "Deutsche Bank Park"
+      }
+    }
+    league Zweiteliga season "2025-2026" {
+      match {
+        date    "2025-08-30"
+        time    "13:00"
+        home    "Hertha BSC"           ("Berlin")
+        away    "Hamburger SV"         ("Hamburg")
+        score   0 - 2
+        stadium "Olympiastadion"
+      }
+      match {
+        date    "2025-09-13"
+        time    "13:00"
+        home    "SC Paderborn"         ("Paderborn")
+        away    "Hannover 96"          ("Hannover")
+        score   1 - 3
+        stadium "Home Deluxe Arena"
+      }
+    }
+  }
+
+  country Spain {
+    league LaLiga season "2025-2026" {
+      match {
+        date    "2025-08-24"
+        time    "21:00"
+        home    "Real Madrid"          ("Madrid")
+        away    "FC Barcelona"         ("Barcelona")
+        score   1 - 2
+        stadium "Santiago Bernabéu"
+      }
+      match {
+        date    "2025-09-14"
+        time    "18:30"
+        home    "Atlético Madrid"      ("Madrid")
+        away    "Sevilla FC"           ("Sevilla")
+        score   2 - 0
+        stadium "Cívitas Metropolitano"
+      }
+    }
+    league SegundaDivision season "2025-2026" {
+      match {
+        date    "2025-08-31"
+        time    "19:00"
+        home    "Racing Santander"     ("Santander")
+        away    "Real Zaragoza"        ("Zaragoza")
+        score   0 - 1
+        stadium "El Sardinero"
+      }
+    }
+  }
+
+}

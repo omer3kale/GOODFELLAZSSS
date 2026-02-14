@@ -1,0 +1,27 @@
+/* Boundary score test: 0-0 and 9-9 */
+footballsite BoundaryScoreTest {
+
+  navigation { Testland; }
+
+  country Testland {
+    league TestLeague season "2025-2026" {
+      match {
+        date    "2025-09-01"
+        time    "15:00"
+        home    "Team A"    ("CityA")
+        away    "Team B"    ("CityB")
+        score   0 - 0
+        stadium "Arena One"
+      }
+      match {
+        date    "2025-09-08"
+        time    "18:00"
+        home    "Team C"    ("CityC")
+        away    "Team D"    ("CityD")
+        score   9 - 9
+        stadium "Arena Two"
+      }
+    }
+  }
+
+}

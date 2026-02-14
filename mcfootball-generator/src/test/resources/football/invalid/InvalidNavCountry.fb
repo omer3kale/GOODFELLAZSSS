@@ -1,0 +1,24 @@
+/* Invalid model: triggers 0xFC004 NavigationCountryExists
+ * — "Portugal" is in navigation but no country Portugal is defined.
+ */
+footballsite InvalidNavTest {
+
+  navigation {
+    Germany;
+    Portugal;
+  }
+
+  country Germany {
+    league Bundesliga season "2025-2026" {
+      match {
+        date    "2025-09-01"
+        time    "15:30"
+        home    "Bayern München"    ("Munich")
+        away    "Borussia Dortmund" ("Dortmund")
+        score   2 - 1
+        stadium "Allianz Arena"
+      }
+    }
+  }
+
+}

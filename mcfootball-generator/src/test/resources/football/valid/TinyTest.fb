@@ -1,0 +1,27 @@
+/* Golden-master test: tiny model — 1 country, 1 league, 2 matches */
+footballsite TinyTest {
+
+  navigation { Testland; }
+
+  country Testland {
+    league TopLeague season "2025-2026" {
+      match {
+        date    "2025-09-01"
+        time    "15:00"
+        home    "FC Alpha"    ("CityA")
+        away    "SC Beta"     ("CityB")
+        score   2 - 1
+        stadium "Alpha Arena"
+      }
+      match {
+        date    "2025-09-08"
+        time    "18:30"
+        home    "SC Beta"     ("CityB")
+        away    "FC Alpha"    ("CityA")
+        score   0 - 3
+        stadium "Beta Stadion"
+      }
+    }
+  }
+
+}

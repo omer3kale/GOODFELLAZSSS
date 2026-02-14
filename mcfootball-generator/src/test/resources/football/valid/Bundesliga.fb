@@ -2,7 +2,6 @@ footballsite BundesligaResults {
 
   navigation {
     Germany;
-    England;
   }
 
   country Germany {

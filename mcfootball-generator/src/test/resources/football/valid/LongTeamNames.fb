@@ -1,0 +1,19 @@
+/* Long team names: test layout robustness with extremely long strings */
+footballsite LongNameTest {
+
+  navigation { Testland; }
+
+  country Testland {
+    league TestLeague season "2025-2026" {
+      match {
+        date    "2025-09-01"
+        time    "15:00"
+        home    "Sporting Club VeryLongNameWithSpacesAndUmlauts München Twelve Extra Words"  ("CityA")
+        away    "FC ReallyLongTeamNameThatGoesOnForever Frankfurt"                          ("CityB")
+        score   1 - 0
+        stadium "Super Long Stadium Name International Arena Complex"
+      }
+    }
+  }
+
+}
