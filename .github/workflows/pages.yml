@@ -31,8 +31,10 @@ jobs:
           distribution: "temurin"
           java-version: "11"
 
-      - name: Build site
-        run: ./gradlew :mcfootball-generator:generateSiteProd
+      - name: Build, test, and generate site
+        run: |
+          ./gradlew :mcfootball-generator:test
+          ./gradlew :mcfootball-generator:generateSiteProd
 
       - name: Prepare Pages artifact
         run: |
