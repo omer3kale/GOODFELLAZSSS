@@ -636,7 +636,7 @@ footballsite AllEuropeResults {
       }
       match {
         date    "2025-10-05"
-        time    "17:05"
+        time    "17:00"
         home    "LOSC Lille"            ("Lille")
         away    "Paris Saint-Germain"   ("Paris")
         score   1 - 2
@@ -668,7 +668,7 @@ footballsite AllEuropeResults {
       }
       match {
         date    "2026-02-01"
-        time    "17:05"
+        time    "17:00"
         home    "Stade Rennais"         ("Rennes")
         away    "LOSC Lille"            ("Lille")
         score   0 - 0
