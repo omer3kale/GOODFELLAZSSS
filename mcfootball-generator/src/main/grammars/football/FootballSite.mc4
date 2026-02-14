@@ -18,6 +18,16 @@ package football;
 grammar FootballSite extends de.monticore.MCBasics,
                               de.monticore.literals.MCCommonLiterals {
 
+  /**
+   * Override Name token from MCBasics to support Unicode Latin Extended
+   * characters (U+00C0–U+017F), enabling identifiers like Österreich,
+   * München, Córdoba, etc.
+   */
+  @Override
+  token Name =
+    ( 'a'..'z' | 'A'..'Z' | '_' | '$' | '\u00C0'..'\u017F' )
+    ( 'a'..'z' | 'A'..'Z' | '_' | '0'..'9' | '$' | '\u00C0'..'\u017F' )*;
+
   /** Root: one football site with a name, optional nav, 1+ countries. */
   symbol scope FootballSite =
     "footballsite" Name "{" Navigation? Country+ "}";

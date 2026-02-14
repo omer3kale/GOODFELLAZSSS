@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GOODFELLAZFß — Home</title>
+  <title>GOODFELLAZßS — Home</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     body { margin: 0; padding: 0; background-color: #ffffff; color: #000000;
@@ -30,7 +30,7 @@
 <body>
   <header>
     <div class="content">
-      <div class="brand">GOODFELLAZFß</div>
+      <div class="brand">GOODFELLAZßS</div>
       <nav class="nav">
         <a href="index.html">Home</a>
       <#list countries as country>
@@ -61,7 +61,7 @@
 
   <footer>
     <div class="content">
-      <span class="brand">GOODFELLAZFß</span>
+      <span class="brand">GOODFELLAZßS</span>
       &nbsp;– European Football 2025/2026
     </div>
   </footer>
