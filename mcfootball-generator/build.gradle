@@ -14,6 +14,7 @@ plugins {
     id 'application'
     id 'jacoco'
     id 'de.monticore.generator' version "$mc_version"
+    id 'maven-publish'
 }
 
 application {
@@ -41,12 +42,13 @@ dependencies {
     // The "grammar" configuration is created by the MontiCore plugin.
     grammar "de.monticore:monticore-grammar:${mc_version}"
 
-    // MontiCore runtime — needed by all generated code
-    implementation "de.monticore:monticore-runtime:${mc_version}"
-    implementation "de.monticore:monticore-grammar:${mc_version}"
+    // MontiCore runtime — exposed as 'api' so downstream consumers
+    // (e.g. GOODFELLAZSSS-BACKEND) can use ASTNode, Log, Parser, etc.
+    api "de.monticore:monticore-runtime:${mc_version}"
+    api "de.monticore:monticore-grammar:${mc_version}"
 
     // SE-commons — logging + utilities used by MontiCore
-    implementation "de.se_rwth.commons:se-commons-logging:${se_commons_version}"
+    api "de.se_rwth.commons:se-commons-logging:${se_commons_version}"
     implementation "de.se_rwth.commons:se-commons-utilities:${se_commons_version}"
 
     // FreeMarker — template engine for HTML generation
@@ -133,4 +135,32 @@ task generateSiteProd(type: JavaExec) {
         '--output',
         file("$buildDir/generated/site").absolutePath
     ]
+}
+
+/* ─────────────────────────────────────────────────────────────────────
+ * Maven publication — publish generator JAR to Maven local or
+ * GitHub Packages so GOODFELLAZSSS-BACKEND can consume it.
+ *
+ * Local:  ./gradlew :mcfootball-generator:publishToMavenLocal
+ * Remote: ./gradlew :mcfootball-generator:publish  (needs GITHUB_TOKEN)
+ * ───────────────────────────────────────────────────────────────────── */
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+            groupId    = 'io.github.omer3kale'
+            artifactId = 'mcfootball-generator'
+            version    = '1.0.0'
+        }
+    }
+    repositories {
+        maven {
+            name = 'GitHubPackages'
+            url  = uri('https://maven.pkg.github.com/omer3kale/GOODFELLAZSSS')
+            credentials {
+                username = project.findProperty('gpr.user') ?: System.getenv('GITHUB_ACTOR')
+                password = project.findProperty('gpr.key')  ?: System.getenv('GITHUB_TOKEN')
+            }
+        }
+    }
 }
